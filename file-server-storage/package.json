@@ -1,0 +1,21 @@
+{
+  "name": "file-server-storage",
+  "version": "1.0.0",
+  "description": "Server to storage files from manager using socket.io",
+  "author": "Pedro Affonso Kehl",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pedrokehl/servidor-arquivos-distribuido"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "nodemon": "nodemon server.js"
+  },
+  "main": "server.js",
+  "dependencies": {
+    "socket.io-client": "^1.7.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
