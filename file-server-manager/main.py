@@ -1,7 +1,6 @@
 import socketio
 import eventlet
-from flask import Flask
-from flask import request
+from flask import Flask, request
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -14,9 +13,18 @@ def post():
     return 'ok'
 
 
+@app.route('/file/<filename>')
+def get(filename):
+    def ack(file):
+        print (file)
+    sio.emit('download-file', filename, callback=ack)
+
+
+
 @sio.on('connect')
 def connect(sid, environ):
     print('connect ', sid)
+    print('environ', environ)
 
 
 @sio.on('disconnect')

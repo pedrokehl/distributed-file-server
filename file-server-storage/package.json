@@ -7,10 +7,6 @@
     "type": "git",
     "url": "https://github.com/pedrokehl/servidor-arquivos-distribuido"
   },
-  "scripts": {
-    "start": "node server.js",
-    "nodemon": "nodemon server.js"
-  },
   "main": "server.js",
   "dependencies": {
     "socket.io-client": "^1.7.3"
