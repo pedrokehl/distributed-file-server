@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/pedrokehl/servidor-arquivos-distribuido"
   },
-  "main": "server.js",
+  "main": "index.js",
   "dependencies": {
     "socket.io-client": "^1.7.3"
   },
