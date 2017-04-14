@@ -10,6 +10,7 @@ from pymongo import MongoClient
 sio = socketio.Server()
 app = Flask(__name__)
 eventlet.monkey_patch()
+
 mongo_cli = MongoClient('localhost', 27017)
 mongo_db = mongo_cli['file_server']
 mongo_coll = mongo_db['files']
@@ -23,15 +24,15 @@ def before_request():
         return jsonify(errors['any-server'])
 
 
-@app.route('/post', methods=['POST'])
+@app.route('/file', methods=['POST'])
 def post():
     print(request.form['name'])
     print(request.form['email'])
     return 'ok'
 
 
-@app.route('/file/<filename>')
-def get(filename):
+@app.route('/file/<filename>', methods=['GET', 'DELETE'])
+def get_delete(filename):
     file_doc = mongo_coll.find_one({'filename': filename})
 
     if not file_doc:
@@ -45,21 +46,45 @@ def get(filename):
     ev = Event()
     response = None
 
-    def ack(file64):
+    # Callback to be executed after server-file responds
+    def get(file64):
         nonlocal response
         nonlocal ev
         response = {
             'codRetorno': 0,
             'descricaoRetorno': file64
         }
-        ev.set()  # unblock HTTP route
+        ev.set()
 
-    sio.emit('download-file', filename, room=server['sid'], callback=ack)
-    ev.wait()  # blocks until ev.set() is called
+    def delete(err):
+        nonlocal response
+        nonlocal ev
+        nonlocal server
+
+        if err:
+            response = errors['file-not-found']
+        else:
+            response = {
+                'codRetorno': 0,
+                'descricaoRetorno': 'Arquivo deletado'
+            }
+            server['files'] -= 1
+        ev.set()
+
+    if request.method == 'DELETE':
+        sio.emit('delete-file', filename, room=server['sid'], callback=delete)
+    else:
+        sio.emit('download-file', filename, room=server['sid'], callback=get)
+
+    # blocks until ev.set() is called
+    ev.wait()
     return jsonify(response)
 
 
 # Event dispatched when a file-server is connected, add the server to the list
+# TODO
+# Check if id already exists on array
+# Balance server
 @sio.on('connect')
 def connect(sid, environ):
     query = parse_qs(environ.get('QUERY_STRING'))
@@ -73,6 +98,7 @@ def connect(sid, environ):
     servers.append(server)
 
 
+# Event dispatched when a file-server is disconnected, remove the server from the list
 @sio.on('disconnect')
 def disconnect(sid):
     server = utils.first_by_property(servers, 'sid', sid)
