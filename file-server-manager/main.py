@@ -26,9 +26,44 @@ def before_request():
 
 @app.route('/file', methods=['POST'])
 def post():
-    print(request.form['name'])
-    print(request.form['email'])
-    return 'ok'
+    filename = request.form['filename']
+    file_doc = mongo_coll.find_one({'filename': filename})
+
+    if file_doc:
+        return jsonify(errors['file-exists'])
+
+    server = utils.element_by_small_value(servers, 'files')
+
+    fileObj = {
+        'filename': filename,
+        'path': filename,
+        'server': server['id']
+    }
+
+    ev = Event()
+    response = None
+
+    def ack(err):
+        nonlocal response
+        nonlocal ev
+        nonlocal server
+
+        if err:
+            response = errors['internal-error']
+        else:
+            response = {
+                'codRetorno': 0,
+                'descricaoRetorno': 'Arquivo Inserido'
+            }
+            mongo_coll.insert_one(fileObj)
+            server['files'] += 1
+        ev.set()
+
+    sio.emit('upload-file', request.form, room=server['sid'], callback=ack)
+
+    # blocks until ev.set() is called
+    ev.wait()
+    return jsonify(response)
 
 
 @app.route('/file/<filename>', methods=['GET', 'DELETE'])
@@ -62,12 +97,13 @@ def get_delete(filename):
         nonlocal server
 
         if err:
-            response = errors['file-not-found']
+            response = errors['internal-error']
         else:
             response = {
                 'codRetorno': 0,
                 'descricaoRetorno': 'Arquivo deletado'
             }
+            mongo_coll.delete_one(file_doc)
             server['files'] -= 1
         ev.set()
 
@@ -82,9 +118,8 @@ def get_delete(filename):
 
 
 # Event dispatched when a file-server is connected, add the server to the list
-# TODO
-# Check if id already exists on array
-# Balance server
+# TODO: Check if id already exists on array
+# TODO: Balance server
 @sio.on('connect')
 def connect(sid, environ):
     query = parse_qs(environ.get('QUERY_STRING'))

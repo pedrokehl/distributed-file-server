@@ -1,6 +1,7 @@
-const serverManager = 'http://localhost:8000/';
 const io = require('socket.io-client');
 const fileService = require('./file-service');
+
+const serverManager = 'http://localhost:8000/';
 
 function init(socketId) {
     const socket = io(serverManager, { query: {id: socketId} });
@@ -9,7 +10,7 @@ function init(socketId) {
     });
 
     socket.on('upload-file', (file, callback) => {
-        fileService.writeFile(file.path, file.base64)
+        fileService.writeFile(file.filename, file.file)
             .then(callback)
             .catch(callback);
     });

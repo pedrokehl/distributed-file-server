@@ -14,5 +14,9 @@ errors = {
     'server-unavailable': {
         'codRetorno': 4,
         'descricaoRetorno': 'Arquivo Indisponível'
+    },
+    'internal-error': {
+        'codRetorno': 5,
+        'descricaoRetorno': 'Erro do servidor'
     }
 }
