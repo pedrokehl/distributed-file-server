@@ -1,8 +1,9 @@
 const fs = require('fs');
-const mainDir = './files/';
+let mainDir;
 
 // Sync to hold requests while main directory is not created
-function checkMainDir() {
+function checkMainDir(dirSuffix) {
+    mainDir = './files_' + dirSuffix + '/';
     if (!fs.existsSync(mainDir)) {
         fs.mkdirSync(mainDir);
     }

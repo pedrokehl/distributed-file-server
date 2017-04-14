@@ -8,5 +8,5 @@ if (!serverId) {
     process.exit();
 }
 
-fileService.checkMainDir();
+fileService.checkMainDir(serverId);
 socketService.init(serverId);

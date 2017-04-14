@@ -5,7 +5,7 @@
   "author": "Pedro Affonso Kehl",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pedrokehl/servidor-arquivos-distribuido"
+    "url": "https://github.com/pedrokehl/distributed-file-server"
   },
   "main": "index.js",
   "dependencies": {
