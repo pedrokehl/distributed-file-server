@@ -20,3 +20,10 @@ errors = {
         'descricaoRetorno': 'Erro do servidor'
     }
 }
+
+config = {
+    'port': 8000,
+    'mongo_server': 'localhost',
+    'mongo_port': 27017,
+    'max_files': 36
+}

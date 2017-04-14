@@ -1,7 +1,7 @@
 import socketio
 import eventlet
 import utils
-from constants import errors
+from constants import errors, config
 from threading import Event
 from flask import Flask, request, jsonify
 from urllib.parse import parse_qs
@@ -11,7 +11,7 @@ sio = socketio.Server()
 app = Flask(__name__)
 eventlet.monkey_patch()
 
-mongo_cli = MongoClient('localhost', 27017)
+mongo_cli = MongoClient(config['mongo_server'], config['mongo_port'])
 mongo_db = mongo_cli['file_server']
 mongo_coll = mongo_db['files']
 
@@ -124,6 +124,7 @@ def connect(sid, environ):
     query = parse_qs(environ.get('QUERY_STRING'))
     id = query['id'][0]
 
+    # Validate if file-server id is already in use.
     if utils.first_by_property(servers, 'id', id):
         return False
 
@@ -145,4 +146,4 @@ def disconnect(sid):
 # wrap Flask application with socketio's middleware
 app = socketio.Middleware(sio, app)
 # deploy as an eventlet WSGI server
-eventlet.wsgi.server(eventlet.listen(('', 8000)), app)
+eventlet.wsgi.server(eventlet.listen(('', config['port'])), app)
