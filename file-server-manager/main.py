@@ -1,12 +1,20 @@
 import socketio
 import eventlet
+from constants import errors
 from threading import Event
 from flask import Flask, request, jsonify
+from urllib.parse import parse_qs
 
 sio = socketio.Server()
 app = Flask(__name__)
 eventlet.monkey_patch()
-servers = []
+servers = {}
+
+
+@app.before_request
+def before_request():
+    if not servers:
+        return jsonify(errors['any-server'])
 
 
 @app.route('/post', methods=['POST'])
@@ -34,7 +42,9 @@ def get(filename):
 
 @sio.on('connect')
 def connect(sid, environ):
-    servers.append(sid)
+    query = parse_qs(environ.get('QUERY_STRING'))
+    id = query['id'][0]
+    servers[sid] = id
 
 
 @sio.on('disconnect')
