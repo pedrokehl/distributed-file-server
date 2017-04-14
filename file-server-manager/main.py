@@ -118,12 +118,15 @@ def get_delete(filename):
 
 
 # Event dispatched when a file-server is connected, add the server to the list
-# TODO: Check if id already exists on array
 # TODO: Balance server
 @sio.on('connect')
 def connect(sid, environ):
     query = parse_qs(environ.get('QUERY_STRING'))
     id = query['id'][0]
+
+    if utils.first_by_property(servers, 'id', id):
+        return False
+
     files = mongo_coll.count({'server': id})
     server = {
         'id': id,

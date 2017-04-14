@@ -9,6 +9,11 @@ function init(socketId) {
         console.log("socket connected");
     });
 
+    socket.on('connect_error', () => {
+        console.error('There is already a file-server with this id.');
+        process.exit(1);
+    });
+
     socket.on('upload-file', (file, callback) => {
         fileService.writeFile(file.filename, file.file)
             .then(callback)
