@@ -1,11 +1,11 @@
 import socketio
 import eventlet
-import utils
-from constants import errors, config
 from threading import Event
 from flask import Flask, request, jsonify
 from urllib.parse import parse_qs
 from pymongo import MongoClient
+import utils
+from constants import errors, config
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -16,6 +16,7 @@ mongo_db = mongo_cli['file_server']
 mongo_coll = mongo_db['files']
 
 servers = []
+current_balances = 0
 
 
 @app.before_request
@@ -118,7 +119,6 @@ def get_delete(filename):
 
 
 # Event dispatched when a file-server is connected, add the server to the list
-# TODO: Balance server
 @sio.on('connect')
 def connect(sid, environ):
     query = parse_qs(environ.get('QUERY_STRING'))
@@ -135,6 +135,11 @@ def connect(sid, environ):
         'sid': sid
     }
     servers.append(server)
+    servers_to_balance = utils.get_servers_to_balance(servers, current_balances)
+
+    if servers_to_balance:
+        # TODO: apply balance with mongo + socket.io
+        print(servers_to_balance)
 
 
 # Event dispatched when a file-server is disconnected, remove the server from the list
