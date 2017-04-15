@@ -16,7 +16,6 @@ mongo_db = mongo_cli['file_server']
 mongo_coll = mongo_db['files']
 
 servers = []
-current_balances = 0
 
 
 @app.before_request
@@ -60,7 +59,7 @@ def post():
             server['files'] += 1
         ev.set()
 
-    sio.emit('upload-file', request.form, room=server['sid'], callback=ack)
+    sio.emit('upload-file', fileObj, room=server['sid'], callback=ack)
 
     # blocks until ev.set() is called
     ev.wait()
@@ -109,16 +108,16 @@ def get_delete(filename):
         ev.set()
 
     if request.method == 'DELETE':
-        sio.emit('delete-file', filename, room=server['sid'], callback=delete)
+        sio.emit('delete-file', file_doc['path'], room=server['sid'], callback=delete)
     else:
-        sio.emit('download-file', filename, room=server['sid'], callback=get)
+        sio.emit('download-file', file_doc['path'], room=server['sid'], callback=get)
 
     # blocks until ev.set() is called
     ev.wait()
     return jsonify(response)
 
 
-# Event dispatched when a file-server is connected, add the server to the list
+# Event dispatched when a file-server is connected, add the server to the list and balance
 @sio.on('connect')
 def connect(sid, environ):
     query = parse_qs(environ.get('QUERY_STRING'))
@@ -135,11 +134,47 @@ def connect(sid, environ):
         'sid': sid
     }
     servers.append(server)
-    servers_to_balance = utils.get_servers_to_balance(servers, current_balances)
+    servers_to_balance = utils.get_servers_to_balance(servers)
 
     if servers_to_balance:
-        # TODO: apply balance with mongo + socket.io
-        print(servers_to_balance)
+        balance_servers(servers_to_balance)
+
+
+def balance_servers(servers_to_balance):
+
+    def transfer(res):
+        # TODO: emit to server_to_add upload-file event
+        print(res)
+        sio.emit('upload-file', res, room=res['server_to_add'])
+
+    # iterate over servers that has more files than expected
+    for server_to_remove in servers_to_balance['servers_high']:
+        # get the number of files that need to be moved
+        files_to_move = server_to_remove['files'] - servers_to_balance['average']
+        for i in range(0, files_to_move):
+            # get the file to be moved
+            file_doc = mongo_coll.find_one({'server': server_to_remove['id']})
+            # get the server to receive the file
+            server_to_add = servers_to_balance['servers_low'][0]
+            # set variable to be emitted
+            req_content = {
+                'server_to_add': server_to_add['sid'],
+                'path': file_doc['path']
+            }
+            # emit transfer-file
+            sio.emit('transfer-file', req_content, room=server_to_remove['sid'], callback=transfer)
+
+            # update references
+            server_to_remove['files'] -= 1
+            server_to_add['files'] += 1
+            # update mongo
+            mongo_coll.update_one(
+                {'_id': file_doc['_id']},
+                {'$set': {'server': server_to_add['id']}},
+                upsert=False)
+            # remove from array, then in the next iteration, will take next servers_low element
+            if server_to_add['files'] == servers_to_balance['average']:
+                del servers_to_balance['servers_low'][0]
 
 
 # Event dispatched when a file-server is disconnected, remove the server from the list

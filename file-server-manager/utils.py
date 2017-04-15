@@ -30,8 +30,7 @@ def sort_by_property(array, property_name, reverse):
     array.sort(key=lambda x: x[property_name], reverse=reverse)
 
 
-def get_servers_to_balance(servers, current_balances):
-    current_balances += 1
+def get_servers_to_balance(servers):
     servers_len = len(servers)
     if servers_len == 1:
         return
@@ -43,9 +42,7 @@ def get_servers_to_balance(servers, current_balances):
     servers_low = []
 
     for server in servers:
-        if current_balances > 1:
-            return
-        elif server['files'] > average:
+        if server['files'] > average:
             servers_high.append(server)
         elif server['files'] < average:
             servers_low.append(server)
