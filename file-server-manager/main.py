@@ -1,6 +1,5 @@
 import socketio
 import eventlet
-from threading import Event
 from flask import Flask, request, jsonify
 from urllib.parse import parse_qs
 from pymongo import MongoClient
@@ -34,35 +33,32 @@ def post():
 
     server = utils.element_by_small_value(servers, 'files')
 
-    fileObj = {
+    file_obj = {
         'filename': filename,
         'path': filename,
         'server': server['id']
     }
 
-    ev = Event()
-    response = None
+    ev = eventlet.event.Event()
 
     def ack(err):
-        nonlocal response
-        nonlocal ev
-        nonlocal server
-
         if err:
-            response = errors['internal-error']
+            res = errors['internal-error']
         else:
-            response = {
+            res = {
                 'codRetorno': 0,
                 'descricaoRetorno': 'Arquivo Inserido'
             }
-            mongo_coll.insert_one(fileObj)
+            mongo_coll.insert_one(file_obj)
             server['files'] += 1
-        ev.set()
 
-    sio.emit('upload-file', fileObj, room=server['sid'], callback=ack)
+        ev.send(res)
+
+    # TODO: jsonify file_obj
+    sio.emit('upload-file', file_obj, room=server['sid'], callback=ack)
 
     # blocks until ev.set() is called
-    ev.wait()
+    response = ev.wait()
     return jsonify(response)
 
 
@@ -78,34 +74,27 @@ def get_delete(filename):
     if not server:
         return jsonify(errors['server-unavailable'])
 
-    ev = Event()
-    response = None
+    ev = eventlet.event.Event()
 
     # Callback to be executed after server-file responds
     def get(file64):
-        nonlocal response
-        nonlocal ev
-        response = {
+        res = {
             'codRetorno': 0,
             'descricaoRetorno': file64
         }
-        ev.set()
+        ev.send(res)
 
     def delete(err):
-        nonlocal response
-        nonlocal ev
-        nonlocal server
-
         if err:
-            response = errors['internal-error']
+            res = errors['internal-error']
         else:
-            response = {
+            res = {
                 'codRetorno': 0,
                 'descricaoRetorno': 'Arquivo deletado'
             }
             mongo_coll.delete_one(file_doc)
             server['files'] -= 1
-        ev.set()
+        ev.send(res)
 
     if request.method == 'DELETE':
         sio.emit('delete-file', file_doc['path'], room=server['sid'], callback=delete)
@@ -113,7 +102,7 @@ def get_delete(filename):
         sio.emit('download-file', file_doc['path'], room=server['sid'], callback=get)
 
     # blocks until ev.set() is called
-    ev.wait()
+    response = ev.wait()
     return jsonify(response)
 
 
