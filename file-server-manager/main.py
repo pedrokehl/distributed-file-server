@@ -39,6 +39,11 @@ def post():
         'server': server['id']
     }
 
+    send_obj = {
+        'file': request.form['file'],
+        'path': filename
+    }
+
     ev = eventlet.event.Event()
 
     def ack(err):
@@ -54,8 +59,7 @@ def post():
 
         ev.send(res)
 
-    # TODO: jsonify file_obj
-    sio.emit('upload-file', file_obj, room=server['sid'], callback=ack)
+    sio.emit('upload-file', send_obj, room=server['sid'], callback=ack)
 
     # blocks until ev.set() is called
     response = ev.wait()
