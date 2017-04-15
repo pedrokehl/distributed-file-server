@@ -1,7 +1,7 @@
 const io = require('socket.io-client');
 const fileService = require('./file-service');
 
-const serverManager = 'http://localhost:8000/';
+const serverManager = 'http://127.0.0.1:8000/';
 
 function init(socketId) {
     const socket = io(serverManager, { query: {id: socketId} });
@@ -10,7 +10,7 @@ function init(socketId) {
     });
 
     socket.on('connect_error', () => {
-        console.error('There is already a file-server with this id.');
+        console.error('There is already a file-server with this id or the connection was refused.');
         process.exit(1);
     });
 

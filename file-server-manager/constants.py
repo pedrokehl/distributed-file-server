@@ -23,7 +23,7 @@ errors = {
 
 config = {
     'port': 8000,
-    'mongo_server': 'localhost',
+    'mongo_server': '127.0.0.1',
     'mongo_port': 27017,
     'max_files': 36
 }
