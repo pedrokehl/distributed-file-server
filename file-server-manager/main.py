@@ -143,8 +143,6 @@ def connect(sid, environ):
 def balance_servers(servers_to_balance):
 
     def transfer(res):
-        # TODO: emit to server_to_add upload-file event
-        print(res)
         sio.emit('upload-file', res, room=res['server_to_add'])
 
     # iterate over servers that has more files than expected
