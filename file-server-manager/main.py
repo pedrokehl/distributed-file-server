@@ -35,13 +35,7 @@ def post():
 
     file_obj = {
         'filename': filename,
-        'path': filename,
         'server': server['id']
-    }
-
-    send_obj = {
-        'file': request.form['file'],
-        'path': filename
     }
 
     ev = eventlet.event.Event()
@@ -59,7 +53,7 @@ def post():
 
         ev.send(res)
 
-    sio.emit('upload-file', send_obj, room=server['sid'], callback=ack)
+    sio.emit('upload-file', request.form, room=server['sid'], callback=ack)
 
     # blocks until ev.set() is called
     response = ev.wait()
@@ -101,9 +95,9 @@ def get_delete(filename):
         ev.send(res)
 
     if request.method == 'DELETE':
-        sio.emit('delete-file', file_doc['path'], room=server['sid'], callback=delete)
+        sio.emit('delete-file', filename, room=server['sid'], callback=delete)
     else:
-        sio.emit('download-file', file_doc['path'], room=server['sid'], callback=get)
+        sio.emit('download-file', filename, room=server['sid'], callback=get)
 
     # blocks until ev.set() is called
     response = ev.wait()
@@ -150,7 +144,7 @@ def balance_servers(servers_to_balance):
             # set variable to be emitted
             req_content = {
                 'server_to_add': server_to_add['sid'],
-                'path': file_doc['path']
+                'filename': file_doc['filename']
             }
             # emit transfer-file
             sio.emit('transfer-file', req_content, room=server_to_remove['sid'], callback=transfer)

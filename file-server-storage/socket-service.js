@@ -15,7 +15,7 @@ function init(socketId) {
     });
 
     socket.on('upload-file', (file, callback) => {
-        fileService.writeFile(file.path, file.file)
+        fileService.writeFile(file.filename, file.file)
             .then(callback)
             .catch(callback);
     });
@@ -33,10 +33,10 @@ function init(socketId) {
     });
 
     socket.on('transfer-file', (req, callback) => {
-        fileService.readFile(req.path)
+        fileService.readFile(req.filename)
             .then((file64) => {
                 req.file = file64;
-                return req.path;
+                return req.filename;
             }).then(fileService.deleteFile)
             .then(() => callback(req))
             .catch(callback);
