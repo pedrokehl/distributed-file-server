@@ -23,16 +23,15 @@ function deleteFile(filePath) {
 function readFile(filePath) {
     const fullPath = mainDir + filePath;
     return new Promise((resolve, reject) => {
-        fs.readFile(fullPath, 'base64', (err, res) => {
-            console.log('err:' + err);
+        fs.readFile(fullPath, (err, res) => {
             if (err) reject(err);
-            else resolve(res);
+            else resolve(convertBinaryToBase64(res));
         });
     });
 }
 
 function writeFile(filePath, base64file) {
-    const file = convertBase64toBinary(base64file);
+    const file = convertBase64ToBinary(base64file);
     const fullPath = mainDir + filePath;
     return new Promise((resolve, reject) => {
         fs.writeFile(fullPath, file, (err, res) => {
@@ -42,8 +41,12 @@ function writeFile(filePath, base64file) {
     });
 }
 
-function convertBase64toBinary(base64) {
+function convertBase64ToBinary(base64) {
     return Buffer.from(base64, 'base64');
+}
+
+function convertBinaryToBase64(binary) {
+    return new Buffer(binary).toString('base64');
 }
 
 module.exports = {
