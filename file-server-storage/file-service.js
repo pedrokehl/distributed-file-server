@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const maxFiles = 5;
+const maxFiles = 36;
 const subFolder = 'more';
 
 let mainDir;
@@ -15,7 +15,8 @@ function checkMainDir(dirSuffix) {
         dirInfo = {
             allFiles: [],
             dirLen: 0,
-            dirPath: mainDir
+            dirPath: mainDir,
+            filesDict: {}
         }
     } else {
         dirInfo = walkFolders(mainDir);
