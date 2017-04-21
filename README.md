@@ -93,20 +93,13 @@ Code  | Content              | Description
     # Run MongoDB
     Execute mongod
     
-    # Go to file-server-manager directory
-    cd distributed-file-server/file-server-manager
-    
-    # Install Python dependencies
+    # Go to file-server-manager directory and install Python dependencies
     pip install -r requirements.txt
     
     # Run the manager
     python main.py
     
-    #Open another terminal and go to the main diretory
-    
-    # Then go to file-server-storage directory
-    cd file-server-storage
-    
+    # Open another terminal and go to the file-server-storage diretory    
     # Install dependencies (use --production flag if you don't want devDependencies)
     npm install
     
