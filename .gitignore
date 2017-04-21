@@ -10,4 +10,4 @@ jspm_packages
 # Optional eslint cache
 .eslintcache
 
-file-server/files_*
+file-server-storage/files_*
