@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const maxFiles = 36;
-const subFolder = 'more';
+const MAX_FILES = 36;
+const SUB_FOLDER = 'more';
 
 let mainDir;
 let dirInfo;
@@ -47,8 +47,8 @@ function walkFolders(dirPath, allFiles, filesDict) {
 }
 
 function checkToCreateSubFolder() {
-    if(dirInfo.dirLen + 1 >= maxFiles) {
-        const newFolder = path.join(dirInfo.dirPath, subFolder);
+    if(dirInfo.dirLen + 1 >= MAX_FILES) {
+        const newFolder = path.join(dirInfo.dirPath, SUB_FOLDER);
         fs.mkdirSync(newFolder);
         dirInfo.dirPath = newFolder;
         dirInfo.dirLen = 0;
