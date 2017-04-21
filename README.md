@@ -94,7 +94,7 @@ Code  | Content              | Description
     Execute mongod
     
     # Go to file-server-manager directory
-    cd distributed-file-server/file-server-storage
+    cd distributed-file-server/file-server-manager
     
     # Install Python dependencies
     pip install -r requirements.txt
@@ -102,10 +102,12 @@ Code  | Content              | Description
     # Run the manager
     python main.py
     
-    # go to file-server-storage directory
-    cd ../file-server-storage
+    #Open another terminal and go to the main diretory
     
-    # Install dependencies
+    # Then go to file-server-storage directory
+    cd file-server-storage
+    
+    # Install dependencies (use --production flag if you don't want devDependencies)
     npm install
     
     # Start the server with the server id
