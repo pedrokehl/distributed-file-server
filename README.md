@@ -8,6 +8,7 @@ Distributed File Server
 - Balance the number of files per server, as file-servers connects and clients send files
 - Restrict 36 files per directory, if it exceeds, should create a new directory
 
+
 ![alt text](https://github.com/pedrokehl/distributed-file-server/blob/master/docs/distributed-file-server-diagram.png "Distributed File Server Diagram")
 
 ### Client
@@ -22,6 +23,7 @@ Implemented with Python using the Flask framework to provide a REST API, MongoDB
 - Control which server should receive which file
 - Persist information about files
 - Balance servers
+
 
 ![alt text](https://github.com/pedrokehl/distributed-file-server/blob/master/docs/manager-diagram.png "File Manager Diagram")
 
@@ -82,6 +84,32 @@ Code  | Content              | Description
 3       | File name already exists | When the client tries to upload a file with a name that is already in use
 4       | File unavailable   | When the server of the file requests is unavailable
 
+
+### Instructions
+
+    # Clone de project
+    git clone --depth=1 https://github.com/pedrokehl/distributed-file-server.git
+    
+    # Run MongoDB
+    Execute mongod
+    
+    # Go to file-server-manager directory
+    cd distributed-file-server/file-server-storage
+    
+    # Install Python dependencies
+    pip install -r requirements.txt
+    
+    # Run the manager
+    python main.py
+    
+    # go to file-server-storage directory
+    cd ../file-server-storage
+    
+    # Install dependencies
+    npm install
+    
+    # Start the server with the server id
+    node index.js 100
 
 ### TODO
 
