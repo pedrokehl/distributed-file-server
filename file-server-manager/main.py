@@ -44,11 +44,12 @@ def post():
         if err:
             res = errors['internal-error']
         else:
+            result = mongo_coll.insert_one(file_obj)
             res = {
-                'codRetorno': 0,
-                'descricaoRetorno': 'Arquivo Inserido'
+                'id': str(result.inserted_id),
+                'filename': filename
             }
-            mongo_coll.insert_one(file_obj)
+            print(res)
             server['files'] += 1
 
         ev.send(res)
@@ -77,8 +78,7 @@ def get_delete(filename):
     # Callback to be executed after server-file responds
     def get(file64):
         res = {
-            'codRetorno': 0,
-            'descricaoRetorno': file64
+            'data': file64
         }
         ev.send(res)
 
@@ -86,11 +86,10 @@ def get_delete(filename):
         if err:
             res = errors['internal-error']
         else:
-            res = {
-                'codRetorno': 0,
-                'descricaoRetorno': 'Arquivo deletado'
-            }
             mongo_coll.delete_one(file_doc)
+            res = {
+                'data': 'File deleted'
+            }
             server['files'] -= 1
         ev.send(res)
 
