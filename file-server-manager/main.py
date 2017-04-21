@@ -20,7 +20,7 @@ servers = []
 @app.before_request
 def before_request():
     if not servers:
-        return jsonify(errors['any-server'])
+        return jsonify(errors['any-server']), 503
 
 
 @app.route('/file', methods=['POST'])
@@ -29,7 +29,7 @@ def post():
     file_doc = mongo_coll.find_one({'filename': filename})
 
     if file_doc:
-        return jsonify(errors['file-exists'])
+        return jsonify(errors['file-exists']), 400
 
     server = utils.element_by_small_value(servers, 'files')
 
@@ -65,12 +65,12 @@ def get_delete(filename):
     file_doc = mongo_coll.find_one({'filename': filename})
 
     if not file_doc:
-        return jsonify(errors['file-not-found'])
+        return jsonify(errors['file-not-found']), 400
 
     server = utils.first_by_property(servers, 'id', file_doc['server'])
 
     if not server:
-        return jsonify(errors['server-unavailable'])
+        return jsonify(errors['server-unavailable']), 503
 
     ev = eventlet.event.Event()
 

@@ -1,23 +1,23 @@
 errors = {
     'any-server': {
-        'codRetorno': 1,
-        'descricaoRetorno': 'Servidor Indisponível'
+        'errorCode': 1,
+        'data': 'Servers unavailable'
     },
     'file-not-found': {
-        'codRetorno': 2,
-        'descricaoRetorno': 'Arquivo Inexistente'
+        'errorCode': 2,
+        'data': 'File does not exist'
     },
     'file-exists': {
-        'codRetorno': 3,
-        'descricaoRetorno': 'Arquivo Já Existe'
+        'errorCode': 3,
+        'data': 'File name already exists'
     },
     'server-unavailable': {
-        'codRetorno': 4,
-        'descricaoRetorno': 'Arquivo Indisponível'
+        'errorCode': 4,
+        'data': 'File unavailable'
     },
     'internal-error': {
-        'codRetorno': 5,
-        'descricaoRetorno': 'Erro do servidor'
+        'errorCode': 5,
+        'data': 'Internal error'
     }
 }
 
