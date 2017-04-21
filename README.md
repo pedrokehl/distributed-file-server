@@ -8,6 +8,8 @@ Distributed File Server
 - Balance the number of files per server, as file-servers connects and clients send files
 - Restrict 36 files per directory, if it exceeds, should create a new directory
 
+![alt text](https://github.com/pedrokehl/distributed-file-server/blob/master/docs/distributed-file-server-diagram.png "Distributed File Server Diagram")
+
 ### Client
 
 Not implemented yet.
@@ -20,6 +22,9 @@ Implemented with Python using the Flask framework to provide a REST API, MongoDB
 - Control which server should receive which file
 - Persist information about files
 - Balance servers
+
+![alt text](https://github.com/pedrokehl/distributed-file-server/blob/master/docs/manager-diagram.png "File Manager Diagram")
+
 
 ### File Server
 Implemented with node.JS using socket.IO to communicate with the File Manager.
@@ -76,3 +81,9 @@ Code  | Content              | Description
 2       | File does not exist    | When the client request a file that does not exists
 3       | File name already exists | When the client tries to upload a file with a name that is already in use
 4       | File unavailable   | When the server of the file requests is unavailable
+
+
+### TODO
+
+- Implement the client
+- Change the manager to accept files directly instead of base64
